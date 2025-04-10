@@ -1,0 +1,703 @@
+{% extends 'base.html' %} {% load static %} {% block pageContent %}
+<style>
+    /* Core styling variables */
+    :root {
+        --main-dark-bg: #121212;
+        --card-dark-bg: #1e1e2d;
+        --blue-accent: #3a79ff;
+        --blue-darker: #2a5fd9;
+        --blue-glow: 0 0 15px rgba(58, 121, 255, 0.6);
+        --text-color: #e0e0e0;
+        --border-radius: 8px;
+        --transition-speed: 0.3s;
+    }
+    
+    .al-logo {
+        height: 3em;
+        width: 3em;
+        object-fit: scale-down;
+        object-position: center center;
+    }
+    
+    /* Section styling */
+    .section-dark {
+        background-color: var(--main-dark-bg);
+        color: var(--text-color);
+        padding: 30px 0;
+        min-height: calc(100vh - 60px);
+        background-image: 
+            radial-gradient(circle at 10% 20%, rgba(58, 121, 255, 0.03) 0%, transparent 20%),
+            radial-gradient(circle at 90% 80%, rgba(58, 121, 255, 0.03) 0%, transparent 20%),
+            linear-gradient(135deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 100%);
+        background-attachment: fixed;
+    }
+    
+    /* Title styling with 3D effect */
+    .title-3d {
+        color: white;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), 0 0 10px rgba(58, 121, 255, 0.3);
+        font-weight: 700;
+        position: relative;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+        font-size: 2.2rem;
+        transform: perspective(500px) translateZ(0);
+        transition: transform 0.5s;
+    }
+    
+    .title-3d:hover {
+        transform: perspective(500px) translateZ(10px);
+    }
+    
+    /* Animated underline for title */
+    .title-underline {
+        background: linear-gradient(90deg, transparent, var(--blue-accent), transparent);
+        height: 3px;
+        width: 80px;
+        margin: 10px auto 30px;
+        border-radius: 3px;
+        box-shadow: var(--blue-glow);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .title-underline::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+        animation: shine 3s infinite;
+    }
+    
+    @keyframes shine {
+        to {
+            left: 100%;
+        }
+    }
+    
+    /* Card styling */
+    .card-dark {
+        background-color: var(--card-dark-bg);
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 
+                   0 0 15px rgba(58, 121, 255, 0.1);
+        transition: all 0.4s ease;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        animation: cardAppear 0.8s ease-out forwards;
+    }
+    
+    @keyframes cardAppear {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .card-dark:hover {
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 
+                   0 0 20px rgba(58, 121, 255, 0.2);
+        transform: translateY(-5px);
+    }
+    
+    /* Add New button styling */
+    .btn-blue-3d {
+        background: linear-gradient(to bottom, var(--blue-accent), var(--blue-darker));
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 10px 20px;
+        font-weight: 500;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 5px rgba(58, 121, 255, 0.3);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .btn-blue-3d::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: all 0.5s;
+        z-index: -1;
+    }
+    
+    .btn-blue-3d:hover::before {
+        left: 100%;
+        transition: all 0.5s;
+    }
+    
+    .btn-blue-3d:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4), 0 0 15px rgba(58, 121, 255, 0.5);
+        background: linear-gradient(to bottom, #4b89ff, var(--blue-accent));
+    }
+    
+    .btn-blue-3d:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+    
+    .btn-blue-3d i {
+        margin-right: 8px;
+        transition: transform 0.3s;
+    }
+    
+    .btn-blue-3d:hover i {
+        transform: rotate(90deg);
+    }
+    
+    /* Table styling */
+    .table-dark-custom {
+        background-color: transparent;
+        color: var(--text-color);
+        border-collapse: separate;
+        border-spacing: 0 8px;
+        width: 100%;
+    }
+    
+    .table-dark-custom thead th {
+        background-color: rgba(58, 121, 255, 0.15);
+        color: white;
+        font-weight: 600;
+        border: none;
+        padding: 15px 12px;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .table-dark-custom thead th::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--blue-accent), transparent);
+        z-index: -1;
+    }
+    
+    .table-dark-custom tbody tr {
+        background-color: rgba(30, 30, 45, 0.7);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+        backdrop-filter: blur(5px);
+        border-radius: var(--border-radius);
+    }
+    
+    .table-dark-custom tbody tr:hover {
+        background-color: rgba(45, 45, 60, 0.9);
+        transform: translateY(-3px) scale(1.005);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 8px rgba(58, 121, 255, 0.2);
+        z-index: 10;
+        position: relative;
+    }
+    
+    .table-dark-custom td {
+        border: none;
+        padding: 15px 12px;
+        vertical-align: middle;
+        transition: all 0.3s;
+    }
+    
+    .table-dark-custom tbody tr:hover td:first-child {
+        border-top-left-radius: var(--border-radius);
+        border-bottom-left-radius: var(--border-radius);
+    }
+    
+    .table-dark-custom tbody tr:hover td:last-child {
+        border-top-right-radius: var(--border-radius);
+        border-bottom-right-radius: var(--border-radius);
+    }
+    
+    /* Status badges */
+    .badge-active {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+        border: none;
+        color: white;
+        font-weight: 500;
+        transform: translateZ(0);
+        transition: all 0.3s;
+    }
+    
+    .badge-active:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 15px rgba(40, 167, 69, 0.7);
+    }
+    
+    .badge-inactive {
+        background: linear-gradient(45deg, #6c757d, #495057);
+        border: none;
+        color: #e0e0e0;
+        font-weight: 500;
+        transform: translateZ(0);
+        transition: all 0.3s;
+    }
+    
+    .badge-inactive:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 15px rgba(108, 117, 125, 0.5);
+    }
+    
+    /* Action dropdown styling */
+    .dropdown-dark {
+        background-color: #252538;
+        border: 1px solid rgba(58, 121, 255, 0.4);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), 0 0 10px rgba(58, 121, 255, 0.2);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        padding: 8px 0;
+        margin-top: 10px;
+        animation: dropFadeIn 0.3s forwards;
+    }
+    
+    @keyframes dropFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .dropdown-item-dark {
+        color: white;
+        transition: all 0.2s;
+        padding: 10px 18px;
+        font-weight: 500;
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+    }
+    
+    .dropdown-item-dark::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(58, 121, 255, 0.1), transparent);
+        transition: all 0.4s;
+        z-index: -1;
+    }
+    
+    .dropdown-item-dark:hover::before {
+        left: 100%;
+    }
+    
+    .dropdown-item-dark:hover {
+        background-color: rgba(58, 121, 255, 0.2);
+        color: white;
+        transform: translateX(5px);
+    }
+    
+    .dropdown-item-dark i {
+        margin-right: 10px;
+        width: 16px;
+        text-align: center;
+        transition: transform 0.3s;
+    }
+    
+    .dropdown-item-dark:hover i {
+        transform: scale(1.2);
+    }
+    
+    .btn-action {
+        background: linear-gradient(to bottom, #2d2d40, #252538);
+        border: 1px solid rgba(58, 121, 255, 0.3);
+        color: white;
+        transition: all 0.3s;
+        padding: 8px 18px;
+        border-radius: var(--border-radius);
+        font-weight: 500;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+    }
+    
+    .btn-action::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(58, 121, 255, 0.1), transparent);
+        transition: all 0.5s;
+        z-index: -1;
+    }
+    
+    .btn-action:hover::after {
+        left: 100%;
+    }
+    
+    .btn-action:hover {
+        background: linear-gradient(to bottom, #3a3a52, #2d2d45);
+        border-color: rgba(58, 121, 255, 0.5);
+        color: white;
+        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3), 0 0 10px rgba(58, 121, 255, 0.2);
+    }
+    
+    /* Category/Subcategory styling */
+    .category-name {
+        font-weight: 600;
+        color: var(--blue-accent);
+        transition: all 0.3s;
+    }
+    
+    tr:hover .category-name {
+        text-shadow: 0 0 5px rgba(58, 121, 255, 0.5);
+    }
+    
+    .subcategory-name {
+        font-weight: 400;
+        color: var(--text-color);
+        transition: all 0.3s;
+        opacity: 0.8;
+    }
+    
+    tr:hover .subcategory-name {
+        opacity: 1;
+    }
+    
+    /* DataTables styling */
+    .dataTables_wrapper .dataTables_length, 
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_info {
+        color: var(--text-color);
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+    }
+    
+    .dataTables_wrapper .dataTables_length select,
+    .dataTables_wrapper .dataTables_filter input {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+        border-radius: var(--border-radius);
+        padding: 8px 12px;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dataTables_wrapper .dataTables_filter input:focus,
+    .dataTables_wrapper .dataTables_length select:focus {
+        border-color: var(--blue-accent);
+        box-shadow: 0 0 0 2px rgba(58, 121, 255, 0.2);
+        outline: none;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-color) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--border-radius);
+        margin: 0 3px;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(58, 121, 255, 0.1), transparent);
+        transition: all 0.5s;
+        z-index: -1;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover::after {
+        left: 100%;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: var(--blue-accent) !important;
+        color: white !important;
+        border-color: var(--blue-accent);
+        box-shadow: var(--blue-glow);
+        transform: translateY(-2px);
+    }
+    
+    /* Truncate text */
+    .truncate-1 {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Button animation */
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(58, 121, 255, 0.7); }
+        70% { box-shadow: 0 0 0 15px rgba(58, 121, 255, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(58, 121, 255, 0); }
+    }
+    
+    /* Row animation */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Empty data message styling */
+    .dataTables_empty {
+        background: rgba(58, 121, 255, 0.05) !important;
+        color: var(--text-color) !important;
+        font-style: italic;
+        padding: 25px !important;
+        text-align: center;
+        font-size: 1rem;
+        border-radius: var(--border-radius);
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<section class="section-dark py-4">
+    <div class="container">
+        <h3 class="title-3d text-center">List of Sub Categories</h3>
+        <div class="title-underline"></div>
+        
+        <div class="card-dark">
+            <div class="card-body p-4">
+                <div class="container-fluid">
+                    <div class="text-end mb-4">
+                        <button class="btn-blue-3d" type="button" id="create_new">
+                            <i class="fa fa-plus"></i> Add New
+                        </button>
+                    </div>
+                    <table class="table table-dark-custom" id="category-tbl">
+                        <colcategory>
+                            <col width="5%">
+                            <col width="15%">
+                            <col width="20%">
+                            <col width="30%">
+                            <col width="15%">
+                            <col width="15%">
+                        </colcategory>
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th class="text-center">DateTime</th>
+                                <th class="text-center">Category/Sub Category</th>
+                                <th class="text-center">Description</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cat in sub_category %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td>{{ cat.date_created|date:"Y-m-d H:i" }}</td>
+                                <td>
+                                    <div class="lh-1">
+                                        <div class="category-name">{{ cat.category}}</div>
+                                        <div class="subcategory-name">{{ cat.name}}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p class="m-0 truncate-1">{{ cat.description|safe }}</p>
+                                </td>
+                                <td class="text-center">
+                                    {% if cat.status == '1' %}
+                                    <span class="badge badge-success badge-active px-3 rounded-pill text-sm py-1">Active</span> 
+                                    {% else %}
+                                    <span class="badge badge-secondary badge-inactive px-3 rounded-pill text-sm py-1">Inactive</span> 
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <div class="dropdown">
+                                        <button class="btn btn-action dropdown-toggle" type="button" id="abtn{{cat.pk}}" data-bs-toggle="dropdown" aria-expanded="false">
+                                          Action
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-dark" aria-labelledby="abtn{{cat.pk}}">
+                                            <li><a class="dropdown-item dropdown-item-dark view-data" href="javascript:void(0)" data-url="{% url 'view-sub_category-pk' cat.pk %}"><i class="fa fa-eye"></i> View</a></li>
+                                            <li><a class="dropdown-item dropdown-item-dark edit-data" href="javascript:void(0)" data-url="{% url 'manage-sub_category-pk' cat.pk %}"><i class="fa fa-edit" style="color: var(--blue-accent);"></i> Edit</a></li>
+                                            <li><a class="dropdown-item dropdown-item-dark delete-data" href="javascript:void(0)" data-url="{% url 'delete-sub_category' cat.pk %}"><i class="fa fa-trash" style="color: #dc3545;"></i> Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock pageContent %} {% block ScriptBlock %}
+<script>
+    $(function() {
+        // Add button hover animation
+        $('.btn-blue-3d').hover(function() {
+            $(this).css('animation', 'pulse 1.5s infinite');
+        }, function() {
+            $(this).css('animation', 'none');
+        });
+        
+        // Add fade-in animation for table rows with staggered delay
+        $('#category-tbl tbody tr').each(function(index) {
+            $(this).css({
+                'opacity': 0,
+                'transform': 'translateY(20px)'
+            }).delay(index * 50).animate({
+                'opacity': 1,
+                'transform': 'translateY(0)'
+            }, 300);
+        });
+        
+        // Add title hover animation
+        $('.title-3d').hover(function() {
+            $(this).css('text-shadow', '0 4px 8px rgba(0, 0, 0, 0.6), 0 0 15px rgba(58, 121, 255, 0.5)');
+        }, function() {
+            $(this).css('text-shadow', '0 2px 5px rgba(0, 0, 0, 0.5), 0 0 10px rgba(58, 121, 255, 0.3)');
+        });
+        
+        // Enhance dropdown visibility
+        $('.dropdown').on('show.bs.dropdown', function () {
+            $(this).find('.dropdown-menu').addClass('animate__animated animate__fadeIn');
+        });
+        
+        $('#create_new').click(function() {
+            uni_modal("<i class='fa fa-plus'></i> Add New Sub Category", "{% url 'manage-sub_category' %}")
+        })
+        $('.view-data').click(function() {
+            uni_modal("<i class='fa fa-th-list'></i> Sub Category Details", $(this).attr('data-url'))
+        })
+        $('.edit-data').click(function() {
+            uni_modal("<i class='fa fa-edit'></i> Edit Sub Category Details", $(this).attr('data-url'))
+        })
+        $('.view_image').click(function() {
+            var img = $(this).attr('data-img-url')
+            $('#viewer_modal #img-viewer-field').attr('src', img)
+            $('#viewer_modal').modal('show')
+        })
+        $('.delete-data').click(function() {
+            _conf("Are you sure to delete this Category?", 'delete_sub_category', ["'" + $(this).attr('data-url') + "'"])
+        })
+        
+        // Initialize DataTable with custom styling
+        $('#category-tbl').find('td, th').addClass('px-2 py-1 align-middle')
+        $('#category-tbl').DataTable({
+            columnDefs: [{
+                orderable: false,
+                targets: [5]
+            }],
+            lengthMenu: [
+                [25, 50, 100, -1],
+                [25, 50, 100, "All"]
+            ],
+            "dom": '<"top"lf>rt<"bottom"ip>',
+            "language": {
+                "lengthMenu": "Show _MENU_ entries",
+                "info": "Showing _START_ to _END_ of _TOTAL_ subcategories",
+                "infoEmpty": "Showing 0 to 0 of 0 subcategories",
+                "search": "Search subcategories:",
+                "zeroRecords": "No matching subcategories found",
+                "emptyTable": "No subcategories available"
+            },
+            "initComplete": function() {
+                // Add custom styling to DataTables elements
+                $('.dataTables_wrapper').css('color', 'var(--text-color)');
+                
+                // Add animation to search input
+                $('.dataTables_filter input').on('focus', function() {
+                    $(this).css('border-color', 'var(--blue-accent)');
+                    $(this).css('box-shadow', '0 0 0 3px rgba(58, 121, 255, 0.2)');
+                }).on('blur', function() {
+                    $(this).css('border-color', 'rgba(255, 255, 255, 0.1)');
+                    $(this).css('box-shadow', '0 2px 5px rgba(0, 0, 0, 0.1)');
+                });
+                
+                // Add glow effect to entries dropdown
+                $('.dataTables_length select').on('focus', function() {
+                    $(this).css('border-color', 'var(--blue-accent)');
+                    $(this).css('box-shadow', '0 0 0 3px rgba(58, 121, 255, 0.2)');
+                }).on('blur', function() {
+                    $(this).css('border-color', 'rgba(255, 255, 255, 0.1)');
+                    $(this).css('box-shadow', '0 2px 5px rgba(0, 0, 0, 0.1)');
+                });
+            },
+            "drawCallback": function() {
+                // Re-apply animations after pagination
+                $('#category-tbl tbody tr').css({
+                    'opacity': 0,
+                    'transform': 'translateY(20px)'
+                });
+                
+                $('#category-tbl tbody tr').each(function(index) {
+                    $(this).delay(index * 50).animate({
+                        'opacity': 1,
+                        'transform': 'translateY(0)'
+                    }, 300);
+                });
+            }
+        });
+    });
+
+    function delete_sub_category(url) {
+        var _this = $('#confirm_modal .modal-body')
+        $('.err-msg').remove();
+        var el = $('<div>')
+        el.addClass("alert alert-danger err-msg")
+        el.hide()
+        start_loader()
+        $.ajax({
+            headers: {
+                "X-CSRFToken": "{{csrf_token}}"
+            },
+            url: url,
+            dataType: 'JSON',
+            error: err => {
+                console.log(err)
+                alert("an error occurred.")
+                end_loader()
+            },
+            success: function(resp) {
+                if (resp.status == 'success') {
+                    location.reload()
+                } else if (!!resp.msg) {
+                    el.html(resp.msg)
+                    _this.prepend(el)
+                    el.show()
+                } else {
+                    el.html("An error occurred")
+                    _this.prepend(el)
+                    el.show()
+                }
+                end_loader()
+            }
+        })
+    }
+</script>
+{% endblock ScriptBlock %}

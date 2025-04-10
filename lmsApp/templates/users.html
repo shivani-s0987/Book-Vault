@@ -1,0 +1,539 @@
+{% extends 'base.html' %} {% load static %} {% block pageContent %}
+<style>
+    :root {
+        --main-dark-bg: #121212;
+        --card-dark-bg: #1e1e2d;
+        --blue-accent: #3a79ff;
+        --blue-glow: 0 0 15px rgba(58, 121, 255, 0.6);
+        --blue-hover: #2a5fd9;
+        --text-color: #e0e0e0;
+        --border-radius: 8px;
+        --card-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+        --transition-speed: 0.3s;
+    }
+    
+    /* Main section styling */
+    .section-dark {
+        background-color: var(--main-dark-bg);
+        color: var(--text-color);
+        padding: 30px 0;
+        min-height: calc(100vh - 210px);
+        background-image: 
+            radial-gradient(circle at 15% 50%, rgba(58, 121, 255, 0.08) 0%, transparent 25%),
+            radial-gradient(circle at 85% 30%, rgba(58, 121, 255, 0.05) 0%, transparent 30%);
+    }
+    
+    /* 3D Title effects */
+    .title-3d {
+        color: white;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), 0 0 10px rgba(58, 121, 255, 0.4);
+        font-weight: 700;
+        position: relative;
+        letter-spacing: 1px;
+        transform: translateZ(0);
+        transition: all 0.4s ease;
+    }
+    
+    .title-underline {
+        background: linear-gradient(90deg, transparent, var(--blue-accent), transparent);
+        height: 3px;
+        width: 80px;
+        margin: 10px auto 30px;
+        border-radius: 3px;
+        box-shadow: var(--blue-glow);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .title-underline::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        animation: shine 3s infinite;
+    }
+    
+    @keyframes shine {
+        to {
+            left: 100%;
+        }
+    }
+    
+    /* Card styling */
+    .card-dark {
+        background-color: var(--card-dark-bg);
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        transition: all var(--transition-speed) ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .card-dark::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--blue-accent), transparent);
+        opacity: 0.7;
+    }
+    
+    /* Button styling */
+    .btn-blue-3d {
+        background: linear-gradient(to bottom, var(--blue-accent), #2a5fd9);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 10px 18px;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transition: all 0.25s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .btn-blue-3d:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4), 0 0 12px rgba(58, 121, 255, 0.5);
+    }
+    
+    .btn-blue-3d::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        z-index: -1;
+        transition: all 0.6s ease;
+    }
+    
+    .btn-blue-3d:hover::after {
+        left: 100%;
+    }
+    
+    .btn-blue-3d:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+    
+    .btn-blue-3d i {
+        margin-right: 8px;
+    }
+    
+    /* Table styling */
+    .table-dark-custom {
+        background-color: transparent;
+        color: var(--text-color);
+        border-collapse: separate;
+        border-spacing: 0 8px;
+        width: 100%;
+        margin-bottom: 0;
+    }
+    
+    .table-dark-custom thead th {
+        background: linear-gradient(180deg, rgba(58, 121, 255, 0.2), rgba(58, 121, 255, 0.1));
+        color: white;
+        font-weight: 600;
+        border: none;
+        padding: 14px 10px;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        border-radius: 0;
+    }
+    
+    .table-dark-custom thead th:first-child {
+        border-top-left-radius: var(--border-radius);
+        border-bottom-left-radius: var(--border-radius);
+    }
+    
+    .table-dark-custom thead th:last-child {
+        border-top-right-radius: var(--border-radius);
+        border-bottom-right-radius: var(--border-radius);
+    }
+    
+    .table-dark-custom tbody tr {
+        background-color: rgba(30, 30, 45, 0.7);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        transition: transform 0.25s, box-shadow 0.25s;
+    }
+    
+    .table-dark-custom tbody tr td:first-child {
+        border-top-left-radius: var(--border-radius);
+        border-bottom-left-radius: var(--border-radius);
+    }
+    
+    .table-dark-custom tbody tr td:last-child {
+        border-top-right-radius: var(--border-radius);
+        border-bottom-right-radius: var(--border-radius);
+    }
+    
+    .table-dark-custom tbody tr:hover {
+        background-color: rgba(45, 45, 60, 0.9);
+        transform: translateY(-2px) scale(1.005);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 8px rgba(58, 121, 255, 0.2);
+        z-index: 2;
+        position: relative;
+    }
+    
+    .table-dark-custom td {
+        border: none;
+        padding: 14px 10px;
+        vertical-align: middle;
+    }
+    
+    /* Dropdown styling */
+    .dropdown-dark {
+        background-color: #252538;
+        border: 1px solid rgba(58, 121, 255, 0.4);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 8px rgba(58, 121, 255, 0.2);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        padding: 8px 0;
+        transform-origin: top center;
+        animation: dropdownFadeIn 0.25s ease;
+    }
+    
+    @keyframes dropdownFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+    
+    .dropdown-item-dark {
+        color: white;
+        transition: all 0.25s;
+        padding: 12px 18px;
+        font-weight: 500;
+        position: relative;
+    }
+    
+    .dropdown-item-dark::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: var(--blue-accent);
+        transform: scaleY(0);
+        transition: transform 0.2s ease;
+    }
+    
+    .dropdown-item-dark:hover {
+        background-color: rgba(58, 121, 255, 0.15);
+        color: white;
+        transform: translateX(3px);
+    }
+    
+    .dropdown-item-dark:hover::before {
+        transform: scaleY(1);
+    }
+    
+    .dropdown-item-dark i {
+        margin-right: 10px;
+        width: 16px;
+        text-align: center;
+    }
+    
+    /* Action button styling */
+    .btn-action {
+        background: linear-gradient(to bottom, #2d2d40, #252538);
+        border: 1px solid rgba(58, 121, 255, 0.3);
+        color: white;
+        transition: all 0.3s;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-action:hover {
+        background: linear-gradient(to bottom, #3a3a52, #2d2d45);
+        border-color: rgba(58, 121, 255, 0.5);
+        color: white;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3), 0 0 8px rgba(58, 121, 255, 0.2);
+    }
+    
+    .btn-action::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: all 0.6s ease;
+    }
+    
+    .btn-action:hover::after {
+        left: 100%;
+    }
+    
+    /* Animation for button hover */
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(58, 121, 255, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(58, 121, 255, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(58, 121, 255, 0); }
+    }
+    
+    /* DataTables Custom Styling */
+    .dataTables_wrapper .dataTables_length, 
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_info {
+        color: var(--text-color);
+        margin-bottom: 18px;
+    }
+    
+    .dataTables_wrapper .dataTables_length select,
+    .dataTables_wrapper .dataTables_filter input {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+        border-radius: var(--border-radius);
+        padding: 8px 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s;
+    }
+    
+    .dataTables_wrapper .dataTables_filter input:focus {
+        border-color: var(--blue-accent);
+        box-shadow: 0 0 0 2px rgba(58, 121, 255, 0.25);
+        outline: none;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-color) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--border-radius);
+        margin: 0 3px;
+        transition: all 0.3s;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: var(--blue-accent) !important;
+        color: white !important;
+        border-color: var(--blue-accent);
+        box-shadow: var(--blue-glow);
+    }
+    
+    /* Custom animation for table loading */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Add content loading animation */
+    .content-loading {
+        animation: fadeInUp 0.5s ease-out forwards;
+    }
+</style>
+
+<section class="section-dark py-4">
+    <div class="container content-loading">
+        <h3 class="title-3d text-center">List of Users</h3>
+        <div class="title-underline"></div>
+        
+        <div class="card-dark">
+            <div class="card-body p-4">
+                <div class="container-fluid">
+                    <div class="text-end mb-4">
+                        <button class="btn-blue-3d" type="button" id="create_new">
+                            <i class="fa fa-plus"></i> Add New User
+                        </button>
+                    </div>
+                    <table class="table table-dark-custom" id="user-tbl">
+                        <colgroup>
+                            <col width="5%">
+                            <col width="50%">
+                            <col width="30%">
+                            <col width="15%">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th class="text-center">Name</th>
+                                <th class="text-center">Username</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr class="table-row-animate">
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td>{{ user.first_name}} {{ user.last_name}}</td>
+                                <td>{{ user.username}}</td>
+                                <td class="text-center">
+                                    <div class="dropdown">
+                                        <button class="btn btn-action dropdown-toggle" type="button" id="abtn{{user.pk}}" data-bs-toggle="dropdown" aria-expanded="false">
+                                          Action
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-dark" aria-labelledby="abtn{{user.pk}}">
+                                            <li><a class="dropdown-item dropdown-item-dark edit-data" href="javascript:void(0)" data-url="{% url 'manage-user-pk' user.pk %}"><i class="fa fa-edit" style="color: var(--blue-accent);"></i> Edit</a></li>
+                                            <li><a class="dropdown-item dropdown-item-dark delete-data" href="javascript:void(0)" data-url="{% url 'delete-user' user.pk %}"><i class="fa fa-trash" style="color: #dc3545;"></i> Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock pageContent %} {% block ScriptBlock %}
+<script>
+    $(function() {
+        // Initial page load animation
+        $('.content-loading').css({
+            'opacity': 0
+        }).animate({
+            'opacity': 1
+        }, 500);
+        
+        // Button hover animation
+        $('.btn-blue-3d').hover(function() {
+            $(this).css('animation', 'pulse 1.5s infinite');
+        }, function() {
+            $(this).css('animation', 'none');
+        });
+        
+        // Button actions
+        $('#create_new').click(function() {
+            uni_modal("<i class='fa fa-plus'></i> Add New User", "{% url 'manage-user' %}")
+        })
+        $('.edit-data').click(function() {
+            uni_modal("<i class='fa fa-edit'></i> Edit User Details", $(this).attr('data-url'))
+        })
+        $('.view_image').click(function() {
+            var img = $(this).attr('data-img-url')
+            $('#viewer_modal #img-viewer-field').attr('src', img)
+            $('#viewer_modal').modal('show')
+        })
+        $('.delete-data').click(function() {
+            _conf("Are you sure to delete this User?", 'delete_user', ["'" + $(this).attr('data-url') + "'"])
+        })
+        
+        // Add staggered fade-in animation for table rows
+        $('.table-row-animate').each(function(index) {
+            $(this).css({
+                'opacity': 0,
+                'transform': 'translateY(20px)'
+            }).delay(index * 50).animate({
+                'opacity': 1,
+                'transform': 'translateY(0)'
+            }, 300);
+        });
+        
+        // Enhance dropdown visibility
+        $('.dropdown').on('show.bs.dropdown', function () {
+            $(this).find('.dropdown-menu').addClass('animate__animated animate__fadeIn');
+        });
+        
+        // Initialize DataTable with custom styling
+        $('#user-tbl').find('td, th').addClass('px-2 py-1 align-middle')
+        $('#user-tbl').DataTable({
+            columnDefs: [{
+                orderable: false,
+                targets: [3]
+            }],
+            lengthMenu: [
+                [25, 50, 100, -1],
+                [25, 50, 100, "All"]
+            ],
+            "dom": '<"top"lf>rt<"bottom"ip>',
+            "language": {
+                "lengthMenu": "Show _MENU_ entries",
+                "info": "Showing _START_ to _END_ of _TOTAL_ users",
+                "infoEmpty": "Showing 0 to 0 of 0 users",
+                "search": "Search users:",
+                "zeroRecords": "No matching users found",
+                "paginate": {
+                    "first": "<i class='fa fa-angle-double-left'></i>",
+                    "last": "<i class='fa fa-angle-double-right'></i>",
+                    "next": "<i class='fa fa-angle-right'></i>",
+                    "previous": "<i class='fa fa-angle-left'></i>"
+                }
+            },
+            "initComplete": function() {
+                // Add custom styling to DataTables elements
+                $('.dataTables_wrapper').css('color', 'var(--text-color)');
+                
+                // Add glow effect to search on focus
+                $('.dataTables_filter input').focus(function() {
+                    $(this).css('box-shadow', '0 0 8px rgba(58, 121, 255, 0.5)');
+                }).blur(function() {
+                    $(this).css('box-shadow', '0 2px 8px rgba(0, 0, 0, 0.2)');
+                });
+            }
+        });
+        
+        // Add hover effect to table rows
+        $(document).on('mouseenter', '#user-tbl tbody tr', function() {
+            $(this).css('transition', 'all 0.25s ease');
+        });
+    })
+
+    function delete_user(url) {
+        var _this = $('#confirm_modal .modal-body')
+        $('.err-msg').remove();
+        var el = $('<div>')
+        el.addClass("alert alert-danger err-msg")
+        el.hide()
+        start_loader()
+        $.ajax({
+            headers: {
+                "X-CSRFToken": "{{csrf_token}}"
+            },
+            url: url,
+            dataType: 'JSON',
+            error: err => {
+                console.log(err)
+                alert("an error occurred.")
+                end_loader()
+            },
+            success: function(resp) {
+                if (resp.status == 'success') {
+                    location.reload()
+                } else if (!!resp.msg) {
+                    el.html(resp.msg)
+                    _this.prepend(el)
+                    el.show('fade')
+                } else {
+                    el.html("An error occurred")
+                    _this.prepend(el)
+                    el.show('fade')
+                }
+                end_loader()
+            }
+        })
+    }
+</script>
+{% endblock ScriptBlock %}

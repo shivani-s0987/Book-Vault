@@ -1,0 +1,688 @@
+{% extends 'base.html' %} {% load static %} {% block pageContent %}
+<section class="py-4">
+    <div class="container">
+        <div class="section-header mb-4">
+            <h3 class="text-center text-white fw-bold">
+                <span class="heading-animation">List of Books</span>
+            </h3>
+            <div class="header-underline"></div>
+        </div>
+        
+        <div class="card bg-dark-blue shadow-pulse">
+            <div class="card-body p-4">
+                <div class="container-fluid">
+                    <div class="text-end mb-4">
+                        <button class="btn-blue-glow" type="button" id="create_new">
+                            <i class="fa fa-plus pulse-icon"></i> Add New
+                        </button>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-dark-custom" id="book-tbl">
+                            <colgroup>
+                                <col width="5%">
+                                <col width="15%">
+                                <col width="20%">
+                                <col width="15%">
+                                <col width="20%">
+                                <col width="15%">
+                                <col width="10%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    <th class="text-center">Date Added</th>
+                                    <th class="text-center">Category/Sub Category</th>
+                                    <th class="text-center">ISBN</th>
+                                    <th class="text-center">Title</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for book in books %}
+                                <tr class="table-row-hover">
+                                    <td class="text-center">{{ forloop.counter }}</td>
+                                    <td>{{ book.date_added|date:"Y-m-d h:i A"}}</td>
+                                    <td>
+                                        <div class="lh-1">
+                                            <div class="category-name">{{ book.sub_category.category.name}}</div>
+                                            <div class="subcategory-name">{{ book.sub_category.name}}</div>
+                                        </div>
+                                    </td>
+                                    <td>{{ book.isbn}}</td>
+                                    <td>{{ book.title }}</td>
+                                    <td class="text-center">
+                                        {% if book.status == '1' %}
+                                        <span class="status-badge status-active">Active</span> 
+                                        {% else %}
+                                        <span class="status-badge status-inactive">Inactive</span> 
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn-action dropdown-toggle" type="button" id="abtn{{book.pk}}" data-bs-toggle="dropdown" aria-expanded="false">
+                                              Action
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-dark action-dropdown" aria-labelledby="abtn{{book.pk}}">
+                                                <li><a class="dropdown-item view-data" href="javascript:void(0)" data-url="{% url 'view-book-pk' book.pk %}"><i class="fa fa-eye icon-glow-blue"></i> View</a></li>
+                                                <li><a class="dropdown-item edit-data" href="javascript:void(0)" data-url="{% url 'manage-book-pk' book.pk %}"><i class="fa fa-edit icon-glow-blue"></i> Edit</a></li>
+                                                <li><a class="dropdown-item delete-data" href="javascript:void(0)" data-url="{% url 'delete-book' book.pk %}"><i class="fa fa-trash icon-glow-red"></i> Delete</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Dark theme base */
+    body {
+        background-color: #0a1020;
+        color: #ffffff;
+        background-image: 
+            radial-gradient(circle at 15% 50%, rgba(25, 100, 200, 0.03) 0%, transparent 33%),
+            radial-gradient(circle at 85% 30%, rgba(25, 100, 200, 0.03) 0%, transparent 33%);
+    }
+    
+    /* Animated heading with enhanced 3D effect */
+    .heading-animation {
+        position: relative;
+        display: inline-block;
+        background: linear-gradient(90deg, #0a4d8c, #00bfff, #0a4d8c);
+        background-size: 200% auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradient 3s ease infinite;
+        text-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+        letter-spacing: 1px;
+    }
+    
+    @keyframes gradient {
+        0% { background-position: 0% center; }
+        50% { background-position: 100% center; }
+        100% { background-position: 0% center; }
+    }
+    
+    /* Header underline with enhanced effects */
+    .header-underline {
+        margin: 0 auto;
+        width: 100px;
+        height: 3px;
+        background-image: linear-gradient(to right, #0a4d8c, #00bfff, #0a4d8c);
+        margin-top: 10px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 3px;
+    }
+    
+    .header-underline::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        width: 20px;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        animation: shine 2s infinite linear;
+        filter: blur(1px);
+    }
+    
+    @keyframes shine {
+        0% { left: -100px; }
+        100% { left: 100%; }
+    }
+    
+    /* Enhanced card styling with 3D effects */
+    .bg-dark-blue {
+        background-color: #0d1a2a;
+        border: 1px solid #1e3a5a;
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .bg-dark-blue::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(145deg, rgba(30, 58, 90, 0.3), rgba(13, 26, 42, 0));
+        border-radius: 12px;
+        pointer-events: none;
+    }
+    
+    .shadow-pulse {
+        box-shadow: 
+            0 10px 20px rgba(0, 0, 0, 0.4),
+            0 0 15px rgba(0, 100, 255, 0.2);
+        animation: shadowPulse 5s infinite alternate;
+        transform-style: preserve-3d;
+        perspective: 1000px;
+    }
+    
+    @keyframes shadowPulse {
+        0% { box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 100, 255, 0.2); }
+        100% { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 140, 255, 0.5); }
+    }
+    
+    /* Enhanced 3D button styling */
+    .btn-blue-glow {
+        background: linear-gradient(145deg, #0a4d8c, #093c6a);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        padding: 10px 20px;
+        font-weight: 500;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 
+            0 4px 8px rgba(0, 0, 0, 0.3),
+            0 0 10px rgba(10, 77, 140, 0.5),
+            inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        transform: translateZ(0);
+    }
+    
+    .btn-blue-glow:hover {
+        box-shadow: 
+            0 6px 15px rgba(0, 0, 0, 0.3),
+            0 0 20px rgba(0, 140, 255, 0.7),
+            inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        transform: translateY(-3px) translateZ(10px);
+    }
+    
+    .btn-blue-glow:active {
+        transform: translateY(1px) translateZ(0);
+        box-shadow: 
+            0 2px 5px rgba(0, 0, 0, 0.3),
+            0 0 10px rgba(10, 77, 140, 0.5);
+    }
+    
+    .btn-blue-glow:before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, rgba(0, 140, 255, 0.1), rgba(0, 140, 255, 0), rgba(0, 140, 255, 0.1));
+        transform: rotate(45deg);
+        animation: shimmer 3s infinite;
+        pointer-events: none;
+    }
+    
+    @keyframes shimmer {
+        0% { transform: rotate(45deg) translateX(-100%); }
+        100% { transform: rotate(45deg) translateX(100%); }
+    }
+    
+    .pulse-icon {
+        animation: pulse 1.5s infinite;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.6; transform: scale(1.1); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    
+    /* Enhanced table styling with 3D depth */
+    .table-dark-custom {
+        background-color: transparent;
+        color: #e0e0e0;
+        border-collapse: separate;
+        border-spacing: 0px;
+    }
+    
+    .table-dark-custom thead th {
+        background-color: #0a304f;
+        border-color: #1e3a5a;
+        color: #ffffff;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        padding: 12px 10px;
+        border-bottom: 2px solid #0d88e6;
+        position: relative;
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .table-dark-custom thead th:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        background: linear-gradient(to right, transparent, rgba(13, 136, 230, 0.8), transparent);
+    }
+    
+    .table-dark-custom tbody td {
+        background-color: rgba(18, 35, 52, 0.8);
+        border-color: #1e3a5a;
+        padding: 12px 10px;
+        vertical-align: middle;
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(30, 58, 90, 0.5);
+    }
+    
+    .table-row-hover {
+        transition: all 0.3s ease;
+    }
+    
+    .table-row-hover:hover td {
+        background-color: #233950;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Enhanced category styling */
+    .category-name {
+        color: #4dabf7;
+        font-weight: 500;
+        text-shadow: 0 0 10px rgba(77, 171, 247, 0.3);
+    }
+    
+    .subcategory-name {
+        color: #a5d8ff;
+        font-size: 0.9rem;
+        margin-top: 4px;
+        opacity: 0.8;
+    }
+    
+    /* Enhanced 3D status badges */
+    .status-badge {
+        display: inline-block;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        position: relative;
+        overflow: hidden;
+        animation: badgeFadeIn 0.5s ease forwards;
+    }
+    
+    @keyframes badgeFadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .status-active {
+        background: linear-gradient(145deg, #198754, #0f5132);
+        box-shadow: 
+            0 3px 8px rgba(25, 135, 84, 0.4),
+            inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        color: white;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    }
+    
+    .status-inactive {
+        background: linear-gradient(145deg, #6c757d, #495057);
+        box-shadow: 
+            0 3px 8px rgba(108, 117, 125, 0.4),
+            inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        color: white;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Enhanced action button with 3D effect */
+    .btn-action {
+        background: linear-gradient(145deg, #233950, #1a2d40);
+        border: 1px solid #2c4b6b;
+        border-radius: 6px;
+        color: white;
+        padding: 6px 14px;
+        transition: all 0.3s ease;
+        box-shadow: 
+            0 2px 5px rgba(0, 0, 0, 0.2),
+            inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    }
+    
+    .btn-action:hover {
+        background: linear-gradient(145deg, #2c4b6b, #233950);
+        color: #4dabf7;
+        transform: translateY(-2px);
+        box-shadow: 
+            0 4px 8px rgba(0, 0, 0, 0.3),
+            inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    }
+    
+    /* Enhanced dropdown menu with better 3D effects */
+    .action-dropdown {
+        background-color: #0d1a2a;
+        border: 1px solid #1e3a5a;
+        box-shadow: 
+            0 5px 15px rgba(0, 0, 0, 0.3),
+            0 0 15px rgba(0, 100, 255, 0.2);
+        padding: 8px;
+        min-width: 180px;
+        border-radius: 8px;
+        transform-origin: top center;
+        animation: dropdownFadeIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    @keyframes dropdownFadeIn {
+        from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    
+    .action-dropdown:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(145deg, rgba(30, 58, 90, 0.2), rgba(13, 26, 42, 0));
+        border-radius: 8px;
+        pointer-events: none;
+    }
+    
+    .action-dropdown .dropdown-item {
+        color: #e0e0e0;
+        padding: 10px 14px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        margin-bottom: 2px;
+    }
+    
+    .action-dropdown .dropdown-item:hover {
+        background-color: #1e3a5a;
+        color: white;
+        transform: translateX(2px);
+    }
+    
+    .action-dropdown .dropdown-item:active {
+        transform: translateX(2px) scale(0.98);
+    }
+    
+    .icon-glow-blue {
+        color: #4dabf7;
+        text-shadow: 0 0 8px rgba(77, 171, 247, 0.5);
+        margin-right: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .icon-glow-red {
+        color: #ff6b6b;
+        text-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
+        margin-right: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .dropdown-item:hover .icon-glow-blue {
+        color: #70bcff;
+        text-shadow: 0 0 12px rgba(77, 171, 247, 0.7);
+    }
+    
+    .dropdown-item:hover .icon-glow-red {
+        color: #ff8f8f;
+        text-shadow: 0 0 12px rgba(255, 107, 107, 0.7);
+    }
+    
+    /* Enhanced DataTables customization */
+    .dataTables_wrapper .dataTables_length, 
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_processing,
+    .dataTables_wrapper .dataTables_paginate {
+        color: #e0e0e0;
+        margin-bottom: 15px;
+    }
+    
+    .dataTables_wrapper .dataTables_length select,
+    .dataTables_wrapper .dataTables_filter input {
+        background-color: #1a2d40;
+        border: 1px solid #2c4b6b;
+        color: white;
+        border-radius: 6px;
+        padding: 8px 12px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .dataTables_wrapper .dataTables_length select:focus,
+    .dataTables_wrapper .dataTables_filter input:focus {
+        outline: none;
+        border-color: #4dabf7;
+        box-shadow: 
+            inset 0 1px 3px rgba(0, 0, 0, 0.2), 
+            0 0 8px rgba(77, 171, 247, 0.5);
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        background: #1a2d40;
+        color: #e0e0e0 !important;
+        border: 1px solid #2c4b6b;
+        border-radius: 6px;
+        margin: 0 3px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: linear-gradient(145deg, #0a4d8c, #093c6a) !important;
+        color: white !important;
+        border: 1px solid #0a4d8c;
+        box-shadow: 0 0 10px rgba(10, 77, 140, 0.5);
+        transform: translateY(-2px);
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        position: relative;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current::after {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        border: 1px solid rgba(77, 171, 247, 0.3);
+        border-radius: 8px;
+        animation: pulseRing 2s infinite;
+        pointer-events: none;
+    }
+    
+    @keyframes pulseRing {
+        0% { transform: scale(0.95); opacity: 0.7; }
+        50% { transform: scale(1.05); opacity: 0.3; }
+        100% { transform: scale(0.95); opacity: 0.7; }
+    }
+    
+    /* Media queries for responsiveness */
+    @media (max-width: 992px) {
+        .table-responsive {
+            overflow-x: auto;
+            margin: 0 -15px;
+            padding: 0 15px;
+        }
+        
+        .table thead th,
+        .table tbody td {
+            white-space: nowrap;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .btn-blue-glow {
+            width: 100%;
+        }
+        
+        .section-header h3 {
+            font-size: 1.5rem;
+        }
+        
+        .card.bg-dark-blue {
+            margin: 0 -5px;
+            border-radius: 8px;
+        }
+    }
+    
+    /* Custom scrollbar for better UX */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #0d1a2a;
+        border-radius: 5px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(145deg, #233950, #1a2d40);
+        border-radius: 5px;
+        border: 2px solid #0d1a2a;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(145deg, #2c4b6b, #233950);
+    }
+    
+    /* Additional animations for page elements */
+    .card.bg-dark-blue {
+        animation: cardEntrance 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+    }
+    
+    @keyframes cardEntrance {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock pageContent %} {% block ScriptBlock %}
+<script>
+    $(function() {
+        $('#create_new').click(function() {
+            uni_modal("<i class='fa fa-plus'></i> Add New Book", "{% url 'manage-book' %}", "modal-lg")
+        })
+        $('.edit-data').click(function() {
+            uni_modal("<i class='fa fa-edit'></i> Edit Book Details", $(this).attr('data-url'), "modal-lg")
+        })
+        $('.view-data').click(function() {
+            uni_modal("<i class='fa fa-th-list'></i> Book Details", $(this).attr('data-url'))
+        })
+        $('.view_image').click(function() {
+            var img = $(this).attr('data-img-url')
+            $('#viewer_modal #img-viewer-field').attr('src', img)
+            $('#viewer_modal').modal('show')
+        })
+        $('.delete-data').click(function() {
+            _conf("Are you sure to delete this Book?", 'delete_book', ["'" + $(this).attr('data-url') + "'"])
+        })
+        $('#book-tbl').find('td, th').addClass('px-2 py-1 align-middle')
+        $('#book-tbl').DataTable({
+            columnDefs: [{
+                orderable: false,
+                targets: [4]
+            }],
+            lengthMenu: [
+                [25, 50, 100, -1],
+                [25, 50, 100, "All"]
+            ],
+            "drawCallback": function() {
+                // Add animation to newly rendered elements
+                $('.status-badge').each(function(index) {
+                    var delay = index * 50;
+                    $(this).css({'opacity':'0', 'transform':'translateY(10px)'});
+                    setTimeout(function(el) {
+                        el.css({'transition':'all 0.3s ease'});
+                        el.css({'opacity':'1', 'transform':'translateY(0)'});
+                    }, delay, $(this));
+                });
+                
+                // Add ripple effect to action buttons
+                $('.btn-action').off('mousedown').on('mousedown', function(e) {
+                    var x = e.pageX - $(this).offset().left;
+                    var y = e.pageY - $(this).offset().top;
+                    
+                    var ripple = $('<span class="ripple"></span>');
+                    ripple.css({
+                        width: $(this).width(),
+                        height: $(this).width(),
+                        top: y - ($(this).width()/2),
+                        left: x - ($(this).width()/2)
+                    });
+                    
+                    $(this).append(ripple);
+                    
+                    setTimeout(function() {
+                        ripple.remove();
+                    }, 600);
+                });
+            },
+            "initComplete": function() {
+                // Enhance DataTables UI
+                $('.dataTables_length select').addClass('select-custom');
+                $('.dataTables_filter input').addClass('input-custom').attr('placeholder', 'Search...');
+            }
+        });
+        
+        // Add ripple effect style
+        $('<style>.ripple{position:absolute;background:rgba(255,255,255,0.3);border-radius:50%;transform:scale(0);animation:ripple 0.6s linear;z-index:10;pointer-events:none}@keyframes ripple{to{transform:scale(2.5);opacity:0}}</style>').appendTo('head');
+    })
+
+    function delete_book(url) {
+        var _this = $('#confirm_modal .modal-body')
+        $('.err-msg').remove();
+        var el = $('<div>')
+        el.addClass("alert alert-danger err-msg")
+        el.hide()
+        start_loader()
+        $.ajax({
+            headers: {
+                "X-CSRFToken": "{{csrf_token}}"
+            },
+            url: url,
+            dataType: 'JSON',
+            error: err => {
+                console.log(err)
+                alert("an error occurred.")
+                end_loader()
+            },
+            success: function(resp) {
+                if (resp.status == 'success') {
+                    location.reload()
+                } else if (!!resp.msg) {
+                    el.html(resp.msg)
+                    _this.prepend(el)
+                    el.show('fade')
+                } else {
+                    el.html("An error occurred")
+                    _this.prepend(el)
+                    el.show('fade')
+                }
+                end_loader()
+            }
+        })
+    }
+</script>
+{% endblock ScriptBlock %}

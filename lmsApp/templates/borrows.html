@@ -1,0 +1,507 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block pageContent %}
+<style>
+    /* Dark Theme Styles for Borrow Transactions */
+    .borrow-section {
+        padding: 2rem 0;
+        background-color: #121212;
+    }
+    
+    .page-title {
+        color: #ffffff;
+        font-weight: 700;
+        text-align: center;
+        text-shadow: 0 0 10px rgba(45, 90, 246, 0.3);
+        font-size: 1.8rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .title-divider {
+        height: 3px;
+        width: 5%;
+        background: linear-gradient(90deg, rgba(45, 90, 246, 0.3), rgba(45, 90, 246, 1), rgba(45, 90, 246, 0.3));
+        border: none;
+        border-radius: 3px;
+        margin: 0.8rem auto 2rem;
+        position: relative;
+    }
+    
+    .title-divider::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: 0;
+        right: 0;
+        height: 7px;
+        background: radial-gradient(ellipse at center, rgba(45, 90, 246, 0.4), transparent 70%);
+        filter: blur(4px);
+    }
+    
+    .content-card {
+        background-color: #1e1e2f;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(45, 90, 246, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+        animation: cardFadeIn 0.5s ease-out forwards;
+        opacity: 0;
+    }
+    
+    @keyframes cardFadeIn {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .content-card:hover {
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(45, 90, 246, 0.2);
+    }
+    
+    .btn-add-new {
+        background: linear-gradient(135deg, #2d5af6, #1a3aa3);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(45, 90, 246, 0.3);
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-add-new:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(45, 90, 246, 0.4);
+        background: linear-gradient(135deg, #3a6bff, #2148c0);
+    }
+    
+    .btn-add-new::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transform: translateX(-100%);
+    }
+    
+    .btn-add-new:hover::after {
+        animation: shimmer 1.5s infinite;
+    }
+    
+    @keyframes shimmer {
+        100% {
+            transform: translateX(100%);
+        }
+    }
+    
+    /* Custom table styling */
+    .borrow-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        color: #e0e0e0;
+    }
+    
+    .borrow-table thead th {
+        background-color: #181829;
+        color: #ffffff;
+        font-weight: 600;
+        padding: 0.8rem;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        border: none;
+        border-bottom: 2px solid rgba(45, 90, 246, 0.5);
+    }
+    
+    .borrow-table tbody tr {
+        transition: background-color 0.3s;
+    }
+    
+    .borrow-table tbody tr:nth-child(odd) {
+        background-color: rgba(30, 32, 47, 0.6);
+    }
+    
+    .borrow-table tbody tr:nth-child(even) {
+        background-color: rgba(26, 27, 40, 0.6);
+    }
+    
+    .borrow-table tbody tr:hover {
+        background-color: rgba(45, 90, 246, 0.15);
+    }
+    
+    .borrow-table td {
+        padding: 0.8rem;
+        border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Status badges */
+    .badge-pending {
+        background: linear-gradient(135deg, #6c757d, #495057);
+        color: #ffffff;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-block;
+        box-shadow: 0 2px 5px rgba(108, 117, 125, 0.3);
+    }
+    
+    .badge-returned {
+        background: linear-gradient(135deg, #2d5af6, #1a3aa3);
+        color: #ffffff;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-block;
+        box-shadow: 0 2px 5px rgba(45, 90, 246, 0.3);
+    }
+    
+    /* Action dropdown styling */
+    .action-btn {
+        background: linear-gradient(135deg, #2a2a40, #1e1e30);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .action-btn:hover, .action-btn:focus {
+        background: linear-gradient(135deg, #323248, #252538);
+        color: #ffffff;
+        border-color: rgba(45, 90, 246, 0.5);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 0 5px rgba(45, 90, 246, 0.2);
+    }
+    
+    .action-dropdown-menu {
+        background-color: #1e1e2f;
+        border: 1px solid rgba(45, 90, 246, 0.2);
+        border-radius: 6px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 8px rgba(45, 90, 246, 0.1);
+        padding: 0.5rem 0;
+        min-width: 10rem;
+    }
+    
+    .action-dropdown-item {
+        color: #e0e0e0;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+    
+    .action-dropdown-item:hover {
+        background-color: rgba(45, 90, 246, 0.15);
+        color: #ffffff;
+    }
+    
+    .action-dropdown-item i {
+        margin-right: 0.5rem;
+        width: 16px;
+        text-align: center;
+    }
+    
+    /* DataTables customization */
+    .dataTables_wrapper .dataTables_length, 
+    .dataTables_wrapper .dataTables_filter, 
+    .dataTables_wrapper .dataTables_info, 
+    .dataTables_wrapper .dataTables_processing, 
+    .dataTables_wrapper .dataTables_paginate {
+        color: #cccccc;
+        margin-bottom: 0.8rem;
+    }
+    
+    .dataTables_wrapper .dataTables_length select,
+    .dataTables_wrapper .dataTables_filter input {
+        background-color: #252538;
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        padding: 0.3rem 0.5rem;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: #cccccc !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        background: linear-gradient(135deg, #2a2a40, #1e1e30);
+        margin: 0 3px;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        color: #ffffff !important;
+        border: 1px solid rgba(45, 90, 246, 0.5);
+        background: linear-gradient(135deg, #2d5af6, #1a3aa3);
+    }
+    
+    /* Utility classes */
+    .text-info-group {
+        line-height: 1.2;
+    }
+    
+    .text-info-primary {
+        color: #cccccc;
+        font-size: 0.85rem;
+    }
+    
+    .text-info-secondary {
+        color: #ffffff;
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+    
+    /* Animation for new elements */
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<section class="borrow-section">
+    <div class="container">
+        <h3 class="page-title animate-fade-in">List of Borrowing Transactions</h3>
+        <hr class="title-divider animate-fade-in">
+        
+        <div class="content-card">
+            <div class="card-body p-4">
+                <div class="container-fluid">
+                    <div class="text-end mb-4">
+                        <button class="btn-add-new" type="button" id="create_new">
+                            <i class="fa fa-plus me-1"></i> Add New
+                        </button>
+                    </div>
+                    
+                    <table class="borrow-table" id="borrow-tbl">
+                        <colgroup>
+                            <col width="5%">
+                            <col width="15%">
+                            <col width="25%">
+                            <col width="25%">
+                            <col width="20%">
+                            <col width="10%">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th class="text-center">Date Added</th>
+                                <th class="text-center">Student</th>
+                                <th class="text-center">Book</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for borrow in borrows %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td>{{ borrow.date_added|date:"Y-m-d h:i A"}}</td>
+                                <td>
+                                    <div class="text-info-group">
+                                        <div class="text-info-primary">{{ borrow.student.code }}</div>
+                                        <div class="text-info-secondary">{{ borrow.student.name }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-info-group">
+                                        <div class="text-info-primary">{{ borrow.book.isbn }}</div>
+                                        <div class="text-info-secondary">{{ borrow.book.title }}</div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    {% if borrow.status == '1' %}
+                                    <span class="badge-pending">Pending</span>
+                                    {% else %}
+                                    <span class="badge-returned">Returned</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <div class="dropdown">
+                                        <button class="action-btn dropdown-toggle" type="button" id="abtn{{borrow.pk}}" data-bs-toggle="dropdown" aria-expanded="false">
+                                          Action
+                                        </button>
+                                        <ul class="dropdown-menu action-dropdown-menu" aria-labelledby="abtn{{borrow.pk}}">
+                                            <li><a class="dropdown-item action-dropdown-item view-data" href="javascript:void(0)" data-url="{% url 'view-borrow-pk' borrow.pk %}"><i class="fa fa-eye"></i> View</a></li>
+                                            <li><a class="dropdown-item action-dropdown-item edit-data" href="javascript:void(0)" data-url="{% url 'manage-borrow-pk' borrow.pk %}"><i class="fa fa-edit text-primary"></i> Edit</a></li>
+                                            <li><a class="dropdown-item action-dropdown-item delete-data" href="javascript:void(0)" data-url="{% url 'delete-borrow' borrow.pk %}"><i class="fa fa-trash text-danger"></i> Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock pageContent %} 
+
+{% block ScriptBlock %}
+<script>
+    $(function() {
+        // Add hover glow effect for the card
+        $('.content-card').hover(
+            function() {
+                $(this).css('box-shadow', '0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(45, 90, 246, 0.2)');
+            },
+            function() {
+                $(this).css('box-shadow', '0 8px 24px rgba(0, 0, 0, 0.4)');
+            }
+        );
+        
+        // Initialize button click handlers
+        $('#create_new').click(function() {
+            uni_modal("<i class='fa fa-plus'></i> Add New Transaction", "{% url 'manage-borrow' %}", "modal-lg")
+        })
+        
+        $('.edit-data').click(function() {
+            uni_modal("<i class='fa fa-edit'></i> Edit Transaction Details", $(this).attr('data-url'), "modal-lg")
+        })
+        
+        $('.view-data').click(function() {
+            uni_modal("<i class='fa fa-th-list'></i> Transaction Details", $(this).attr('data-url'), "modal-lg")
+        })
+        
+        $('.view_image').click(function() {
+            var img = $(this).attr('data-img-url')
+            $('#viewer_modal #img-viewer-field').attr('src', img)
+            $('#viewer_modal').modal('show')
+        })
+        
+        $('.delete-data').click(function() {
+            _conf("Are you sure to delete this Transaction?", 'delete_borrow', ["'" + $(this).attr('data-url') + "'"])
+        })
+        
+        // Initialize DataTable with custom styling
+        var borrowTable = $('#borrow-tbl').DataTable({
+            columnDefs: [{
+                orderable: false,
+                targets: [4]
+            }],
+            lengthMenu: [
+                [10, 25, 50, 100, -1],
+                [10, 25, 50, 100, "All"]
+            ],
+            autoWidth: false,
+            responsive: true,
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search transactions...",
+                info: "Showing _START_ to _END_ of _TOTAL_ transactions",
+                lengthMenu: "Show _MENU_ transactions",
+                emptyTable: "No borrowing transactions found",
+                zeroRecords: "No matching transactions found"
+            },
+            initComplete: function() {
+                // Add custom styling to DataTables elements
+                $('.dataTables_filter input').addClass('search-input').css({
+                    'background-color': '#252538',
+                    'color': '#ffffff',
+                    'border': '1px solid rgba(45, 90, 246, 0.3)',
+                    'border-radius': '6px',
+                    'padding': '0.4rem 0.8rem',
+                    'box-shadow': '0 2px 5px rgba(0, 0, 0, 0.1)'
+                });
+                
+                $('.dataTables_length select').css({
+                    'background-color': '#252538',
+                    'color': '#ffffff',
+                    'border': '1px solid rgba(45, 90, 246, 0.3)',
+                    'border-radius': '6px',
+                    'padding': '0.3rem 0.5rem'
+                });
+                
+                // Add custom class to pagination buttons
+                $('.dataTables_paginate .paginate_button').addClass('paginate-custom');
+            }
+        });
+        
+        // Add ripple effect to buttons
+        function createRipple(event) {
+            const button = event.currentTarget;
+            
+            const circle = document.createElement("span");
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.offsetLeft - diameter / 2}px`;
+            circle.style.top = `${event.clientY - button.offsetTop - diameter / 2}px`;
+            circle.classList.add("ripple");
+            
+            const ripple = button.getElementsByClassName("ripple")[0];
+            if (ripple) {
+                ripple.remove();
+            }
+            
+            button.appendChild(circle);
+        }
+        
+        const buttons = document.getElementsByClassName("btn-add-new");
+        for (const button of buttons) {
+            button.addEventListener("click", createRipple);
+        }
+    });
+
+    function delete_borrow(url) {
+        var _this = $('#confirm_modal .modal-body')
+        $('.err-msg').remove();
+        var el = $('<div>')
+        el.addClass("alert alert-danger err-msg")
+        el.hide()
+        start_loader()
+        $.ajax({
+            headers: {
+                "X-CSRFToken": "{{csrf_token}}"
+            },
+            url: url,
+            dataType: 'JSON',
+            error: err => {
+                console.log(err)
+                alert("an error occurred.")
+                end_loader()
+            },
+            success: function(resp) {
+                if (resp.status == 'success') {
+                    location.reload()
+                } else if (!!resp.msg) {
+                    el.html(resp.msg)
+                    _this.prepend(el)
+                    el.show()
+                } else {
+                    el.html("An error occurred")
+                    _this.prepend(el)
+                    el.show()
+                }
+                end_loader()
+            }
+        })
+    }
+</script>
+{% endblock ScriptBlock %}

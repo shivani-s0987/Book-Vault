@@ -1,0 +1,573 @@
+{% extends 'base.html' %}{% load static %}{% block pageContent %}
+<style>
+    :root {
+        --primary-dark: #0f172a;
+        --secondary-dark: #1e293b;
+        --primary-blue: #3b82f6;
+        --accent-blue: #60a5fa;
+        --text-light: #f8fafc;
+        --glow-blue: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+
+    body {
+        background-color: var(--primary-dark);
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        position: relative;
+    }
+
+    body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('{% static "assets/default/img/wallpaper2you_231931.jpg" %}') no-repeat center center;
+        background-size: cover;
+        opacity: 0.15;
+        z-index: -1;
+    }
+
+    .particles-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        overflow: hidden;
+    }
+
+    .particle {
+        position: absolute;
+        background-color: var(--accent-blue);
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: float 15s infinite linear;
+    }
+
+    @keyframes float {
+        0% {
+            transform: translateY(0) translateX(0) rotate(0deg);
+            opacity: 0;
+        }
+        20% {
+            opacity: 0.4;
+        }
+        80% {
+            opacity: 0.2;
+        }
+        100% {
+            transform: translateY(-100vh) translateX(100px) rotate(360deg);
+            opacity: 0;
+        }
+    }
+
+    main {
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    #page-title {
+        font-size: 3.5em;
+        color: var(--text-light);
+        font-weight: 700;
+        text-shadow: 0 0 15px rgba(59, 130, 246, 0.7);
+        margin-bottom: 0.5em;
+        animation: pulse 3s infinite alternate;
+        letter-spacing: 2px;
+    }
+
+    @keyframes pulse {
+        0% {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        100% {
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.9), 0 0 30px rgba(59, 130, 246, 0.4);
+        }
+    }
+
+    .login-container {
+        background-color: var(--secondary-dark);
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
+        overflow: hidden;
+        transform-style: preserve-3d;
+        perspective: 1000px;
+        transform: translateZ(0);
+        transition: all 0.5s ease;
+        max-width: 450px;
+        width: 90%;
+    }
+
+    .login-container:hover {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(59, 130, 246, 0.5);
+        transform: translateY(-5px) translateZ(0);
+    }
+
+    .login-header {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        padding: 1.5rem;
+        color: var(--text-light);
+        border-radius: 16px 16px 0 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            rgba(255, 255, 255, 0) 100%
+        );
+        transform: rotate(45deg);
+        animation: shine 6s infinite;
+    }
+
+    @keyframes shine {
+        0% {
+            left: -100%;
+        }
+        20%, 100% {
+            left: 100%;
+        }
+    }
+
+    .login-header h4 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .login-body {
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .form-control {
+        background-color: rgba(15, 23, 42, 0.7);
+        border: 2px solid rgba(59, 130, 246, 0.3);
+        border-radius: 8px;
+        color: var(--text-light);
+        padding: 12px 15px;
+        width: 100%;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+        background-color: rgba(15, 23, 42, 0.9);
+    }
+
+    .control-label {
+        color: var(--text-light);
+        margin-bottom: 8px;
+        display: block;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .btn-login {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: var(--text-light);
+        border: none;
+        border-radius: 8px;
+        padding: 12px 25px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+
+    .btn-login:hover {
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4), 0 0 15px rgba(59, 130, 246, 0.5);
+        transform: translateY(-3px);
+    }
+
+    .btn-login:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-login::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            rgba(255, 255, 255, 0) 100%
+        );
+        transform: rotate(45deg);
+        transition: all 0.3s ease;
+        opacity: 0;
+    }
+
+    .btn-login:hover::after {
+        animation: btnShine 1.5s ease-out;
+    }
+
+    @keyframes btnShine {
+        0% {
+            left: -100%;
+            opacity: 1;
+        }
+        100% {
+            left: 100%;
+            opacity: 0;
+        }
+    }
+
+    .character {
+        position: absolute;
+        bottom: -100px;
+        width: 120px;
+        height: 120px;
+        opacity: 0.7;
+        animation: bobCharacter 3s ease-in-out infinite alternate;
+        z-index: 0;
+    }
+
+    .character-1 {
+        left: 5%;
+        animation-delay: 0s;
+    }
+
+    .character-2 {
+        right: 5%;
+        animation-delay: 1.5s;
+    }
+
+    @keyframes bobCharacter {
+        0% {
+            transform: translateY(0);
+        }
+        100% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .err-msg {
+        border-radius: 8px;
+        margin-bottom: 15px;
+        animation: fadeInDown 0.5s ease;
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        #page-title {
+            font-size: 2.5em;
+        }
+        
+        .login-container {
+            width: 85%;
+        }
+        
+        .login-body {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<div class="particles-container" id="particles-js"></div>
+
+<div class="d-flex flex-column w-100 justify-content-center align-items-center" style="position: relative; z-index: 2;">
+    <div class="col-12 py-4 mb-3 text-center">
+        <h2 class="text-center fw-bolder" id="page-title">{{system_name}}</h2>
+    </div>
+    
+    <div class="login-container">
+        <div class="login-header">
+            <h4>Access Portal</h4>
+        </div>
+        <div class="login-body">
+            <form id="login-user" action="" method="POST">
+                {% csrf_token %}
+                <div class="container-fluid p-0">
+                    <div class="form-group">
+                        <label for="username" class="control-label">Username</label>
+                        <input type="text" class="form-control" autofocus name="username" id="username" required="required">
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="control-label">Password</label>
+                        <input type="password" class="form-control" name="password" id="password" required="required">
+                    </div>
+                    <div class="form-group mb-0">
+                        <div class="d-flex w-100 justify-content-center align-items-center">
+                            <button class="btn-login" type="submit">
+                                Sign In <i class="fas fa-sign-in-alt ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="character character-1">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="30" r="25" fill="#3b82f6" />
+            <circle cx="40" cy="25" r="5" fill="white" />
+            <circle cx="60" cy="25" r="5" fill="white" />
+            <path d="M40 45C43.3333 48.3333 56.6667 48.3333 60 45" stroke="white" stroke-width="2" stroke-linecap="round" />
+            <path d="M50 55L50 80" stroke="#3b82f6" stroke-width="5" />
+            <path d="M30 65L70 65" stroke="#3b82f6" stroke-width="5" />
+            <path d="M30 95L40 65" stroke="#3b82f6" stroke-width="5" />
+            <path d="M70 95L60 65" stroke="#3b82f6" stroke-width="5" />
+        </svg>
+    </div>
+    
+    <div class="character character-2">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="30" r="25" fill="#60a5fa" />
+            <circle cx="40" cy="25" r="5" fill="white" />
+            <circle cx="60" cy="25" r="5" fill="white" />
+            <path d="M40 40C43.3333 43.3333 56.6667 43.3333 60 40" stroke="white" stroke-width="2" stroke-linecap="round" />
+            <path d="M50 55L50 80" stroke="#60a5fa" stroke-width="5" />
+            <path d="M30 65L70 65" stroke="#60a5fa" stroke-width="5" />
+            <path d="M30 95L40 65" stroke="#60a5fa" stroke-width="5" />
+            <path d="M70 95L60 65" stroke="#60a5fa" stroke-width="5" />
+        </svg>
+    </div>
+</div>
+
+{% endblock pageContent %} {% block ScriptBlock %}
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script>
+    // Initialize particles.js
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof particlesJS !== 'undefined') {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#3b82f6"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                    },
+                    "opacity": {
+                        "value": 0.3,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 2,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#3b82f6",
+                        "opacity": 0.2,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 1,
+                        "direction": "none",
+                        "random": true,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 0.5
+                            }
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+        } else {
+            // Fallback if particles.js isn't loaded
+            createParticles();
+        }
+        
+        // Add 3D effect to login card on mouse move
+        const loginContainer = document.querySelector('.login-container');
+        if (loginContainer) {
+            document.addEventListener('mousemove', (e) => {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 50;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 50;
+                loginContainer.style.transform = `translateZ(0) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            });
+            
+            // Reset transform when mouse leaves
+            document.addEventListener('mouseleave', () => {
+                loginContainer.style.transform = 'translateZ(0) rotateY(0) rotateX(0)';
+            });
+        }
+    });
+    
+    // Fallback particle animation if particles.js isn't available
+    function createParticles() {
+        const container = document.getElementById('particles-js');
+        if (!container) return;
+        
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // Random position, size and animation duration
+            const size = Math.random() * 5 + 2;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+            particle.style.animationDelay = `${Math.random() * 5}s`;
+            
+            container.appendChild(particle);
+        }
+    }
+    
+    $(function() {
+        // Add input focus animation
+        $('.form-control').on('focus', function() {
+            $(this).parent().find('.control-label').addClass('text-primary');
+        }).on('blur', function() {
+            $(this).parent().find('.control-label').removeClass('text-primary');
+        });
+        
+        // Login form submission - keeping original functionality
+        $('#login-user').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+            var el = $('<div>')
+            el.addClass("alert alert-danger err-msg")
+            el.hide()
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+            start_loader();
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": '{{csrf_token}}'
+                },
+                url: "{% url 'login-user' %}",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err)
+                    alert("An error occured", 'error');
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        el.removeClass("alert alert-danger err-msg")
+                        location.href = "{% url 'home-page' %}"
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        el.text(resp.msg)
+                    } else {
+                        el.text("An error occured", 'error');
+                        end_loader();
+                        console.err(resp)
+                    }
+                    _this.prepend(el)
+                    el.show('slow')
+                    $("html, body, .modal").scrollTop(0);
+                    end_loader()
+                }
+            })
+        })
+    })
+</script>
+{% endblock ScriptBlock %}

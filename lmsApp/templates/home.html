@@ -1,0 +1,392 @@
+{% extends "base.html" %} 
+{% load humanize %} 
+{% load customfilter %} 
+{% block pageContent %}
+<style>
+    /* Dark Theme Base Styles */
+:root {
+    --dark-bg: #121212;
+    --darker-bg: #0a0a0a;
+    --card-bg: #1e1e2f;
+    --text-color: #ffffff;
+    --text-muted: #a0a0a0;
+    --blue-primary: #2d5af6;
+    --blue-glow: rgba(45, 90, 246, 0.5);
+    --blue-accent: #4d79ff;
+    --green-accent: #36b37e;
+    --orange-accent: #ff9f43;
+    --purple-accent: #805ad5;
+    --cyan-accent: #00cfe8;
+    --card-border-radius: 12px;
+    --transition-speed: 0.3s;
+}
+
+body {
+    background-color: var(--dark-bg);
+    color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Dashboard Section Styles */
+.dashboard-section {
+    padding: 1.5rem 0.5rem;
+}
+
+.dashboard-title {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    text-shadow: 0 0 10px rgba(45, 90, 246, 0.3);
+}
+
+.user-name {
+    color: var(--blue-accent);
+    position: relative;
+}
+
+.welcome-container {
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.glow-divider {
+    height: 2px;
+    background: linear-gradient(90deg, rgba(45, 90, 246, 0), rgba(45, 90, 246, 0.8) 50%, rgba(45, 90, 246, 0));
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.glow-divider::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, rgba(45, 90, 246, 0), rgba(45, 90, 246, 0.4) 50%, rgba(45, 90, 246, 0));
+    filter: blur(3px);
+}
+
+/* Dashboard Cards */
+.dashboard-stats {
+    margin-top: 1rem;
+}
+
+.stat-card {
+    background-color: var(--card-bg);
+    border-radius: var(--card-border-radius);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    position: relative;
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+    height: 100%;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(45, 90, 246, 0.1);
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.stat-card.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
+}
+
+.card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: var(--card-border-radius);
+    transition: opacity var(--transition-speed);
+    opacity: 0;
+    z-index: 0;
+}
+
+.glow-active {
+    opacity: 1;
+}
+
+.stat-content {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 1.75rem;
+    margin-right: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(45, 90, 246, 0.3);
+}
+
+.stat-info {
+    flex-grow: 1;
+    text-align: right;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Card Color Variations */
+.primary-card {
+    background: linear-gradient(135deg, #1e2440, #2a3158);
+}
+
+.primary-card .card-glow {
+    box-shadow: 0 0 30px var(--blue-glow);
+    background: radial-gradient(circle at 50% 50%, rgba(45, 90, 246, 0.2), transparent 70%);
+}
+
+.primary-card .stat-icon {
+    color: var(--blue-primary);
+}
+
+.secondary-card {
+    background: linear-gradient(135deg, #202334, #2c304d);
+}
+
+.secondary-card .card-glow {
+    box-shadow: 0 0 30px rgba(128, 90, 213, 0.4);
+    background: radial-gradient(circle at 50% 50%, rgba(128, 90, 213, 0.2), transparent 70%);
+}
+
+.secondary-card .stat-icon {
+    color: var(--purple-accent);
+}
+
+.tertiary-card {
+    background: linear-gradient(135deg, #1a3a32, #265046);
+}
+
+.tertiary-card .card-glow {
+    box-shadow: 0 0 30px rgba(54, 179, 126, 0.4);
+    background: radial-gradient(circle at 50% 50%, rgba(54, 179, 126, 0.2), transparent 70%);
+}
+
+.tertiary-card .stat-icon {
+    color: var(--green-accent);
+}
+
+.accent-card {
+    background: linear-gradient(135deg, #3a2e1f, #4d3b27);
+}
+
+.accent-card .card-glow {
+    box-shadow: 0 0 30px rgba(255, 159, 67, 0.4);
+    background: radial-gradient(circle at 50% 50%, rgba(255, 159, 67, 0.2), transparent 70%);
+}
+
+.accent-card .stat-icon {
+    color: var(--orange-accent);
+}
+
+.info-card {
+    background: linear-gradient(135deg, #1e3a56, #255173);
+}
+
+.info-card .card-glow {
+    box-shadow: 0 0 30px rgba(0, 207, 232, 0.4);
+    background: radial-gradient(circle at 50% 50%, rgba(0, 207, 232, 0.2), transparent 70%);
+}
+
+.info-card .stat-icon {
+    color: var(--cyan-accent);
+}
+
+.dark-card {
+    background: linear-gradient(135deg, #1c1c2e, #252538);
+}
+
+.dark-card .card-glow {
+    box-shadow: 0 0 30px rgba(45, 90, 246, 0.4);
+    background: radial-gradient(circle at 50% 50%, rgba(45, 90, 246, 0.2), transparent 70%);
+}
+
+.dark-card .stat-icon {
+    color: var(--blue-accent);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stat-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .stat-icon {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-info {
+        text-align: center;
+    }
+}
+    </style>
+<!--Section: Content-->
+<section class="dashboard-section">
+    <div class="welcome-container">
+        <h2 class="dashboard-title">Welcome, <span class="user-name">{{request.user.first_name}}&nbsp;{{request.user.last_name}}</span>!</h2>
+    </div>
+    <div class="glow-divider"></div>
+    
+    <div class="row justify-content-center dashboard-stats">
+        <!-- Categories Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-3">
+            <div class="stat-card primary-card">
+                <div class="card-glow"></div>
+                <div class="card-body">
+                    <div class="stat-content">
+                        <div class="stat-icon">
+                            <i class="fas fa-th-list"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{categories|intcomma}}</div>
+                            <div class="stat-label">Active Categories</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sub Categories Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-3">
+            <div class="stat-card secondary-card">
+                <div class="card-glow"></div>
+                <div class="card-body">
+                    <div class="stat-content">
+                        <div class="stat-icon">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{sub_categories|intcomma}}</div>
+                            <div class="stat-label">Active Sub Categories</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Students Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-3">
+            <div class="stat-card tertiary-card">
+                <div class="card-glow"></div>
+                <div class="card-body">
+                    <div class="stat-content">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{students|intcomma}}</div>
+                            <div class="stat-label">Active Students</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Books Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-3">
+            <div class="stat-card accent-card">
+                <div class="card-glow"></div>
+                <div class="card-body">
+                    <div class="stat-content">
+                        <div class="stat-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{books|intcomma}}</div>
+                            <div class="stat-label">Active Books</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pending Transactions Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-3">
+            <div class="stat-card info-card">
+                <div class="card-glow"></div>
+                <div class="card-body">
+                    <div class="stat-content">
+                        <div class="stat-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{pending|intcomma}}</div>
+                            <div class="stat-label">Pending Transactions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Transactions Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-3">
+            <div class="stat-card dark-card">
+                <div class="card-glow"></div>
+                <div class="card-body">
+                    <div class="stat-content">
+                        <div class="stat-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{transactions|intcomma}}</div>
+                            <div class="stat-label">Total Transactions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock pageContent %} 
+
+{% block ScriptBlock %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate dashboard cards on load
+        const cards = document.querySelectorAll('.stat-card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.classList.add('animate-in');
+            }, 100 * index);
+        });
+        
+        // Add hover effect listeners
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.querySelector('.card-glow').classList.add('glow-active');
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.querySelector('.card-glow').classList.remove('glow-active');
+            });
+        });
+    });
+</script>
+{% endblock ScriptBlock %}
